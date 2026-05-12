@@ -8,8 +8,9 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import pandas as pd
 import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from optical_depth import Tau, Irradiance, watts2photons, irradiance_ph, irradiance, Xi, n_all, height, wl, column_n
-
+from atmosphere.scaleheight import H_all_gz, H_all
 
 h = 6.62607015e-34 #plancks constant
 h_ev = 4.135667e-15 #plancks constant in eV
@@ -17,7 +18,7 @@ c = 2.99792458e8 #speed of light [m/s]
 e = 1.60217663e-19 #elementary charge [C]
 
 #load photo-ionisation cross sections
-phot_ion = pd.read_csv("2and3ionization/phot_ion.dat",sep=r"\s+", skiprows=6)
+phot_ion = pd.read_csv("optdepth_ionization/phot_ion.dat",sep=r"\s+", skiprows=6)
 wl_short = phot_ion.iloc[:,0].to_numpy()
 
 #interpolate photo ionisation cross angles to irradiance data
@@ -97,27 +98,48 @@ for X in range(len(Xi)):
     max_index = int(np.argmax(q))
     max_value = float(q[max_index])
     max_ionisation.append([max_value, max_index+100])
-print(max_ionisation)
+
 
 #calculate chapman profiles from peak ionization values, assume constant scale height ?
+def chapman(peak_ion, scaleheight, z, SZA):
+    x = (z - peak_ion[1])/(scaleheight)
+    return peak_ion[0] * np.exp( 1 - x - 1/np.cos(np.deg2rad(SZA)) * np.exp(- x ) )
+
+chapman_profiles = []
+for idx, X in enumerate(Xi):
+    ch_p = chapman(max_ionisation[0], H_all_gz[100:], height[101:], X)
+    chapman_profiles.append(ch_p)
 
 
 #make plots
 if __name__ == "__main__":
-    fig, axs = plt.subplots(1,1)
+    fig, axs = plt.subplots(1,2)
     ycoord = height[100:]
     for key,ele in enumerate(total_photoion):
-        axs.plot(ele, ycoord, label = f"$\chi$ = {Xi[key]}")
-        axs.scatter(max_ionisation[key][0], max_ionisation[key][1])
-    axs.set_xlabel("ionization rate [$m^{-3}$ $s^{-1}$]")
-    axs.set_ylabel("height [km]")
-    axs.set_xscale("log")
+        axs[0].plot(ele, ycoord, label = f"$\chi$ = {Xi[key]}")
+        axs[0].scatter(max_ionisation[key][0], max_ionisation[key][1])
+    axs[0].set_xlabel("ionization rate [$m^{-3}$ $s^{-1}$]")
+    axs[0].set_ylabel("height [km]")
+    axs[0].set_xscale("log")
+    axs[0].set_title("calculated profiles")
+    axs[0].set_xlim(1e5,1e10)
+    axs[0].grid()
+
+    ycoord2 = height[101:]
+    for key,ele in enumerate(chapman_profiles):
+        axs[1].plot(ele, ycoord2, label = f"$\chi$ = {Xi[key]}")
+        axs[1].scatter(max_ionisation[key][0], max_ionisation[key][1])
+    axs[1].set_title("Chapman profiles")
+    axs[1].set_xlabel("ionization rate [$m^{-3}$ $s^{-1}$]")
+    axs[1].set_ylabel("height [km]")
+    axs[1].set_xscale("log")
+    axs[1].set_xlim(1e5,1e10)
+    axs[1].grid()
     plt.legend()
     plt.tight_layout()
     plt.show()
 
     ycoord = height[100:]
-  
     for key,ele in enumerate(photo_electrons):
         fig, axs = plt.subplots(1,1)
         plt.suptitle(f"solar zenith angle {Xi[key]} degrees")

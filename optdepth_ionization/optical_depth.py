@@ -13,17 +13,17 @@ import pandas as pd
 #read in all necessary data and initiate vectors/arrays
 
 #heightprofiles of number densities [cm^-3]
-n_data = pd.read_csv("1atmosphere/MSIS.dat",sep=r"\s+", skiprows=16)
+n_data = pd.read_csv("atmosphere/MSIS.dat",sep=r"\s+", skiprows=16)
 height = n_data.iloc[:,0].to_numpy()
 
 #Irradiance [W/m^2/nm] for different wavelengths [nm]
-I_data = pd.read_csv("2and3ionization/fism_daily_hr19990216.dat")
+I_data = pd.read_csv("optdepth_ionization/fism_daily_hr19990216.dat")
 wl = I_data["wavelength (nm)"].to_numpy()*1e-9 #wavelength in data in meters
 wl = wl[:1000]
 I_inf = I_data["irradiance (W/m^2/nm)"].to_numpy()[:1000]*1e9 #irradiance on top of atmopshere for different wavelengths
 
 #crosssections [m^2] for different species for different wavelengths [m]
-cs_data = pd.read_csv("2and3ionization/phot_abs.dat",sep=r"\s+", skiprows=8)
+cs_data = pd.read_csv("optdepth_ionization/phot_abs.dat",sep=r"\s+", skiprows=8)
 wl_short = cs_data.iloc[:,0].to_numpy()
 cs_N2 = cs_data.iloc[:,1].to_numpy()
 cs_O = cs_data.iloc[:,2].to_numpy()
