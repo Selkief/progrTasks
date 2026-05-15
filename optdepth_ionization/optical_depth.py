@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import pandas as pd
+import matplotlib as mpl
 
 #read in all necessary data and initiate vectors/arrays
 
@@ -51,7 +52,7 @@ Xi = [0, 15, 30, 45, 60, 75] #[degrees]
 
 ################define functions###############
 #optical depth for different angles of Xi, returns a list over all wavelength present in input data
-#this should work for angles up to 60 degrees
+#this should work for angles up to 60 degrees (maybe 75)
 def Tau(column_density, absorption_cs, angle):
     tau = column_density[100:] @ absorption_cs
     return tau /np.cos( np.deg2rad(angle) )
@@ -68,8 +69,8 @@ def watts2photons(E_total, wavelengths):
     nr_photons = E_total/E_i
     return nr_photons
 
-###############calculate all the stuff#################
-#calculate optical depth for heights in the thermosphere (90-600km)
+###############calculate optical depth and irradiance#################
+#calculate optical depth for heights in the thermosphere (100-600km)
 #and for different angles of incidence
 
 optical_depth = [] #in [m]
@@ -87,18 +88,18 @@ for X in Xi:
 
 #make plots
 if __name__ == "__main__":
-    
+    #mpl.rcParams['font.size'] = 14
     xcoord = wl*1e9
     ycoord = n_data.iloc[100:,0]
     for key,ele in enumerate(optical_depth):
         fig, axs = plt.subplots(2,1)
         plt.suptitle(f"solar zenith angle {Xi[key]} degrees")
         plot1 = axs[0].pcolormesh(xcoord, ycoord, ele, norm=mcolors.LogNorm(vmin = 1e-2, vmax= 1e3), cmap="plasma")
-        plot2 = axs[1].pcolormesh(xcoord, ycoord, irradiance[key], norm=mcolors.LogNorm(vmin = 1e0, vmax = 1e7), cmap="plasma")
+        plot2 = axs[1].pcolormesh(xcoord, ycoord, irradiance[key], norm=mcolors.LogNorm(vmin = 1e4, vmax = 1e10), cmap="plasma")
         cbar1 = fig.colorbar(plot1)
         cbar2 = fig.colorbar(plot2)
         cbar1.set_label("optical depth")
-        cbar2.set_label("Irradiance [W $m^{-2} s^{-1} nm^{-1}$]")
+        cbar2.set_label("Irradiance [W $m^{-2} s^{-1}$]")
         axs[0].set_xlabel("wavelength [nm]")
         axs[0].set_ylabel("height [km]")
         axs[1].set_xlabel("wavelength [nm]")
