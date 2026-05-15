@@ -47,31 +47,32 @@ k4 = 5e-22
 k5 = 1.4e-16 * np.power((Tr/300), -0.44)
 k6 = 5e-17 * np.power((Tr/300), -0.8)
 
-#must change inital conditions --> seperate function?
 
-#define ODEs for a certain height 
-def initial_cond(height):
-    #gets initial densities for a certain height from the arrays with the nr densities
-    #and returns them
-    n_e = n_e_data[ height - 100 ]
-    n_Oplus = n_Oplus_data[ height - 100]
-    n_O2plus = n_O2plus_data[ height - 100]
-    n_N2plus = n_N2plus_data[ height - 100]
-    n_NO = n_NO_data[ height - 100]
-    n_NOplus = n_NOplus_data[ height - 100]
+
+def initial_cond(ht):
+    #gets initial densities for a certain height from the arrays with the nr densities and returns them
+    n_e = n_e_data[ ht - 100 ]
+    n_Oplus = n_Oplus_data[ ht - 100]
+    n_O2plus = n_O2plus_data[ ht - 100]
+    n_N2plus = n_N2plus_data[ ht - 100]
+    n_NO = n_NO_data[ ht - 100]
+    n_NOplus = n_NOplus_data[ ht - 100]
 
     return n_e, n_Oplus, n_O2plus, n_N2plus, n_NOplus, n_NO
 
-def calc_q(ionization_rate, height):
+
+#change this to adjust to changes in densities during solving ODEs? sth wrong with q_N2plus!?
+def calc_q(ionization_rate, h, Oplus, O2plus, NOplus):
     #calculates ionisation rate for all the ion species and the electrons from total ionization rate
     #returns array with rate for [q_e, q_Oplus, q_O2plus, q_NOplus, q_NO]
-    idx = height-100
+    idx = h-100
     q_tot = ionization_rate
     q_e = q_tot
-    q_Oplus = frac_Oplus[idx] * q_tot
-    q_O2plus = frac_O2plus[idx] * q_tot
-    q_NOplus = frac_NOplus[idx] * q_tot
-    q_N2plus = q_e * 0.92 * n_N2_data[idx] / (0.92 * n_N2_data[idx] + n_O2_data[idx] + 0.56 * n_O_data[idx])
+    q_Oplus = Oplus * q_tot
+    q_O2plus = O2plus * q_tot
+    q_NOplus = NOplus * q_tot
+    q_N2plus = q_e - (q_Oplus + q_O2plus + q_NOplus)
+    #q_N2plus = q_e * 0.92 * n_N2_data[idx] / (0.92 * n_N2_data[idx] + n_O2_data[idx] + 0.56 * n_O_data[idx])
     q_NO = 0.0 #neutral, doesn't have ionization rate
     
     return [q_e, q_Oplus, q_O2plus, q_N2plus, q_NOplus, q_NO]
@@ -116,24 +117,33 @@ def reactions(t, z, q, height):
     return [dn_e, dn_Oplus, dn_O2plus, dn_N2plus, dn_NOplus, dn_NO]
 
 
-def ODE_solver(altitude):
+def ODE_solver(altitude, method):
     #integrate for 3600s with constant ionizatio rate of 1e9 (height 110km)
-    q0 = calc_q(1e9, altitude)
+    q0 = calc_q(1e9, altitude, frac_Oplus[altitude-100], frac_O2plus[altitude-100], frac_NOplus[altitude-100])
     IC = initial_cond(altitude)
-    sol0 = solve_ivp(reactions, [0,3600], IC, method = "RK45", args=(q0, altitude))
+    sol0 = solve_ivp(reactions, [0,3600], IC, method = method, args=(q0, altitude))
 
     #use previous solution as new initial conditions
     #integrate with q_e=2*1e10 for 160s, then no ionisation at all
-    q1 = calc_q(2e10, altitude)
-    sol1 = solve_ivp(reactions, [3600, 3600+160], sol0.y[:,-1], method="RK45", args=(q1, altitude) )
-    q2 = calc_q(0.0, altitude)
-    sol2 = solve_ivp(reactions, [3600+160, 3600+400], sol1.y[:,-1], method="RK45", args=(q2, altitude) )
+    Oplus = sol0.y[1,-1]/sol0.y[0,-1]
+    O2plus = sol0.y[2,-1]/sol0.y[0,-1]
+    NOplus = sol0.y[4,-1]/sol0.y[0,-1]
+    q1 = calc_q(2e10, altitude, Oplus, O2plus, NOplus)
+    sol1 = solve_ivp(reactions, [3600, 3600+160], sol0.y[:,-1], method=method, args=(q1, altitude) )
+
+    Oplus = sol1.y[1,-1]/sol1.y[0,-1]
+    O2plus = sol1.y[2,-1]/sol1.y[0,-1]
+    NOplus = sol1.y[4,-1]/sol1.y[0,-1]
+    q2 = calc_q(0.0, altitude, Oplus, O2plus, NOplus)
+    sol2 = solve_ivp(reactions, [3600+160, 3600+400], sol1.y[:,-1], method=method, args=(q2, altitude) )
 
     sols = np.hstack((sol0.y, sol1.y, sol2.y))  # Combine solutions along the state variable axis
     times = np.hstack((sol0.t, sol1.t, sol2.t))      #combine time arrays
     return sols, times
 
-solutions_250, time_250 = ODE_solver(250)
+solutions_250, time_250 = ODE_solver(250, "BDF")
+
+#charge conservation -->show in percent or in abs values?
 electrons = solutions_250[0,:]
 ions = np.sum(solutions_250[1:5,:], axis=0)
 charge = ions - electrons

@@ -6,6 +6,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+import matplotlib as mpl
 import pandas as pd
 import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
@@ -38,13 +39,16 @@ for idx, ele in enumerate(wl_th):
     filtered = mask * ion_cs[idx]
     filtered_ion_cs.append(filtered)
 
-#calculate photo electron energies --> excess ionization energy
+
 def ph_e_energies(wavelength, wl_thr):
+    #calculates excess ionization energy according to
+    #E_e = E_ph - E_th_jl = hc/abs(q_e) * (1/lambda - 1/lambda_th)
+    #takes in an array of wavelengths as wavelengths to convert and a scalar for ionization threshold 
     E = h*c/np.abs(e) * (1/wavelength - 1/wl_thr)
     E = np.where(E<0, 0, E)
     return E
 
-#plot the transformation as test: wl --> E(eV)
+#plot the transformation as test: wl [m] --> E [eV]
 energies = []
 for j in wl_th:   
     energies.append(ph_e_energies(wl, j))
@@ -87,7 +91,7 @@ def photo_ion_rate_matrix(densities, ion_cs, EUVflux):
         
     return P_total, q_total, E_eV
 
-#calculate photoionization, peak ionization and photo electrons for all SZAs
+#calculate photoionization, photo electrons and peak ionization for all SZAs
 total_photoion = []
 photo_electrons = []
 max_ionisation = []
@@ -100,19 +104,29 @@ for X in range(len(Xi)):
     max_ionisation.append([max_value, max_index+100])
 
 
-#calculate chapman profiles from peak ionization values, assume constant scale height ?
+#calculate chapman profiles from just the calculated peak ionization values and heights
+#  for a constant scale height 
 def chapman(peak_ion, scaleheight, z, SZA):
     x = (z - peak_ion[1])/(scaleheight)
     return peak_ion[0] * np.exp( 1 - x - 1/np.cos(np.deg2rad(SZA)) * np.exp(- x ) )
 
+#zm and qm are theoretical peak ionization values and heights from chapman model 
+# see brekke 4.15 and 4.18 
 chapman_profiles = []
+zm = []
+qm = []
+H = H_all_gz[200]
 for idx, X in enumerate(Xi):
-    ch_p = chapman(max_ionisation[0], H_all_gz[100:], height[101:], X)
+    ch_p = chapman(max_ionisation[0], H_all_gz[200], height[101:], X)
     chapman_profiles.append(ch_p)
+    zm.append( np.array(max_ionisation)[0,1] + np.log(1/np.cos(np.deg2rad(X)))*H )
+    qm.append( np.array(max_ionisation)[0,0] * np.cos(np.deg2rad(X)))
 
 
 #make plots
 if __name__ == "__main__":
+    mpl.rcParams['font.size'] = 14
+    #compare calculated ionisation profiles (axs[0]) and chapman profiles (axs[1])as a function of height
     fig, axs = plt.subplots(1,2)
     ycoord = height[100:]
     for key,ele in enumerate(total_photoion):
@@ -129,7 +143,7 @@ if __name__ == "__main__":
     for key,ele in enumerate(chapman_profiles):
         axs[1].plot(ele, ycoord2, label = f"$\chi$ = {Xi[key]}")
         axs[1].scatter(max_ionisation[key][0], max_ionisation[key][1])
-    axs[1].set_title("Chapman profiles")
+    axs[1].set_title(f"Chapman profiles with H={H_all_gz[200]:.0f}km")
     axs[1].set_xlabel("ionization rate [$m^{-3}$ $s^{-1}$]")
     axs[1].set_ylabel("height [km]")
     axs[1].set_xscale("log")
@@ -138,20 +152,38 @@ if __name__ == "__main__":
     plt.legend()
     plt.tight_layout()
     plt.show()
+    
+    #compare calculated and chapman peak ionization values and heights as func of SZA
+    fig, ax1 = plt.subplots()
+    ax1.scatter(Xi, np.array(max_ionisation)[:, 0], facecolors='none', edgecolors='b', label='Peak Ionization calculated')
+    ax1.scatter(Xi, qm, color="b", label="from chapman")
+    ax1.set_xlabel("SZA")
+    ax1.set_ylabel("Peak Ionization Value (q_m)", color='b')
+    ax1.tick_params(axis='y', labelcolor='b')
+    plt.legend()
+    ax2 = ax1.twinx()
+    ax2.scatter(Xi, np.array(max_ionisation)[:,1], facecolors='none', edgecolors='r', label="Peak Height of Ionization")
+    ax2.scatter(Xi, zm, color="r" , label = "zm from chapman")
+    ax2.set_ylabel("Peak Height of Ionization (km)", color="red")
+    ax2.tick_params(axis='y', labelcolor='red')
+    plt.legend()
+    plt.show()
 
+    #plot photo electron production for different SZAs (function of height and energy)
     ycoord = height[100:]
     for key,ele in enumerate(photo_electrons):
         fig, axs = plt.subplots(1,1)
         plt.suptitle(f"solar zenith angle {Xi[key]} degrees")
         plot1 = axs.pcolormesh(new_x, ycoord, ele, norm=mcolors.LogNorm(vmin = 1e12, vmax = 1e18), cmap="jet")
         cbar1 = fig.colorbar(plot1)
-        cbar1.set_label("photon electrons [$m^{-2}s^{-1}$]")
+        cbar1.set_label("photo electrons [$m^{-2}s^{-1}$]")
         axs.set_xlabel("Energy [eV]")
         axs.set_ylabel("height [km]")
         axs.set_xlim(0, 150)
         plt.tight_layout()
-        plt.show()
+        #plt.show()
 
+    #ionization cross sections
     plt.plot(wl*1e9, ion_cs_N2, label = "N2")
     plt.plot(wl*1e9, ion_cs_O, label="O")
     plt.plot(wl*1e9, ion_cs_O2, label = "O2")

@@ -14,16 +14,16 @@
 \usepackage{graphicx}
 \usepackage{siunitx}
 
-\graphicspath{ {C:/Users/skief/Documents/UiT/semester8/space physics/progrTasks/2and3ionization/}}
+\graphicspath{ {C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTasks/optdepth_ionization/figures/}}
 
 \begin{document}
 \author{Selma Kiefersauer}
-\title{Report on Programming Task 2}
+\title{Report on Programming Task 2 and 3}
 \maketitle
 
 \section{Optical depth}
 
-The equation for optical depth for vertical incidence:
+The equation for optical depth for vertical incidence where dz goes from the bottom of the atmosphere upwards:
 \begin{equation}
 \tau(z,\lambda, 0) = \sum_{j} \sigma_{j}^{a}(\lambda) \int_{z}^{\infty} n_j(z') \,dz'
 \end{equation}
@@ -37,29 +37,89 @@ This gets more complicated for even higher incidence angles up to 90\si{\degree}
 \end{equation}
 For my calculations I used equation (2), as this reduces to equation(1) for vertical incidence anyways as cos(0)=1. 
 
-But first the cross sections had to be interpolated to the wavelength resolution in the irradiance file. I used np.interpolate as this gave the best fiting results. But I get 0 for all wavelength after 100nm as there is no more data in the cross section file. 
+But first the cross sections had to be interpolated to the wavelength resolution in the irradiance file. I used np.interpolate as this gave the best fiting results. But I get 0 for all wavelength after 100nm as there is no more data in the cross section file. Because of that I only used wavelengths in the interval [0,100]nm in the calculations and dropped the rest due to insufficient data. Figure 1 shows the original and interpolated cross sections and it can be seen that the interpolated cross sections mostly lie exactly on top of the original cross sections, except for at the local maxima where there is a minor difference between them. 
+
 \begin{figure}[H]
 	\centering
 	\caption{crosssections for different wavelength}
 	\includegraphics[width=0.7\textwidth]{crosssec.png}
 \end{figure}
 
-Altitude variations of the thermospheric densities, based on the MSIS data file:
+I also converted all data to SI units for the calculations, I also early on converted energy flux in $Watts/m^2$ into photonflux in $\frac{photons}{s \cdot m^2}$. As photons at different wavelength have different energies I wrote a function that converts energy into number of photons dependent on the wavelength:
+\begin{python}
+##convert Watts/m^2 into photons/s/m^2 (Plancks law E= hc/wavelength)
+def watts2photons(E_total, wavelengths):
+    h = 6.62607015e-34 #plancks constant
+    c = 2.99792458e8 #speed of light [m/s]
+    E_i = h*c/np.array(wavelengths)
+    nr_photons = E_total/E_i
+    return nr_photons
+\end{python}
+
+ Altitude variations of the thermospheric densities, based on the MSIS data file are shown in figure 2.
+
 \begin{figure}[H]
 	\centering
 	\caption{}
 	\includegraphics[width=0.7\textwidth]{n.png}
 \end{figure}
 
-EUV fluxes for different heights and wavelengths can be calculated as:
+EUV fluxes for different heights and wavelengths can be calculated from the optical depth as:
 \begin{equation}
 I(z,\lambda) = I^{\infty}(\lambda)exp(-\tau(z,\lambda,\chi))
 \end{equation}
 $I^{\infty}(\lambda)$ is the photon flux at infinity, or at the top of the thermosphere.
 
+Here is the python implementation of optical depth and photon flux:
+
+\begin{python}
+#all crosssections stored in a matrix
+abs_cs = [pol_O, pol_N2, pol_O2] #ordered to fit the order in the n_data file [m^2]
+abs_cs_matrix = np.vstack(abs_cs)
+
+#all densities[m^-3] stored in a matrix
+n_all = n_data.iloc[:,1:4].to_numpy()*1e6
+#column density, integrate from the top down in steps of 1km
+dz=1000
+column_n = np.cumsum(n_all[::-1, :] * dz, axis=0)[::-1]
+
+#relevant angles for Xi
+Xi = [0, 15, 30, 45, 60, 75] #[degrees]
+
+#optical depth for different angles of Xi, returns a list over all wavelength present in input data
+#this should work for angles up to 60 degrees (maybe 75)
+def Tau(column_density, absorption_cs, angle):
+    tau = column_density[100:] @ absorption_cs
+    return tau /np.cos( np.deg2rad(angle) )
+
+#Irradiance
+def Irradiance(opt_depth, Irradiance):
+    return np.array(Irradiance) * np.exp(-opt_depth)
+    
+###############calculate optical depth and irradiance#################
+#calculate optical depth for heights in the thermosphere (100-600km)
+#and for different angles of incidence
+
+optical_depth = [] #in [m]
+irradiance = []
+irradiance_ph = []
+for X in Xi:
+    T = Tau(column_n, abs_cs_matrix, X)
+    I = Irradiance(T , I_inf)
+    I_ph = watts2photons(I, wl)
+    optical_depth.append(T)
+    irradiance.append(I)
+    irradiance_ph.append(I_ph)
+\end{python}
+
+Figure 3 shows the results: optical depth and photon fluxes for solar zenith angles between 0 and 75 degrees.
+
+--------Add discussion of results------
+we can see that the optical depth is very small on top of the atmosphere as the number densities are very low and starts to increase rapidly further down around 200km altitude, depending on the solar zenith angle. Larger solar zenith angle --> optical depth increases earlier. We can also see that the photon fluxes decrease rapidly at about 100km, with slight variations depending on solar zenith angle and wavelength. 
+
 \begin{figure}[H]
 	\centering
-	\caption{Optical depth and EUV fluxes for different angles of incidence.}
+	\caption{Optical depth and EUV photon fluxes for different angles of incidence.}
 	\begin{subfigure}[b]{0.49\textwidth}
 		\includegraphics[width=\textwidth]{optdepth0}
 	\end{subfigure}
@@ -80,54 +140,86 @@ $I^{\infty}(\lambda)$ is the photon flux at infinity, or at the top of the therm
 	\end{subfigure}
 \end{figure}
 
-Python code for the calculations:
-\begin{python}
-#relevant angles for Xi
-Xi = [0, 15, 30, 45, 60] #[degrees]
-
-#optical depth for different angles of Xi, returns a list over all wavelength present in input data
-#this should work for angles up to 60 degrees
-def Tau(n_profiles, nr_of_species, altitude, angle):
-    tau = 0
-    for i in range(nr_of_species):
-        integral = 0
-        for z in range( altitude, len(n_data.iloc[:,0]) ):
-            integral += n_profiles.iloc[z,i+1] * 1e6 * 1000
-        tau += np.dot( cs[i] , integral )
-    return tau * 1/np.cos( angle * (np.pi/180) )
-
-#calculate optical depth for heights in the thermosphere (90-600km)
-#and for different angles of incidence
-optical_depth = [] #in [m]
-for idx,X in enumerate(Xi):
-    T = []
-    for m in range(90,600):
-        T.append( Tau(n_data, 3, m, X) )
-    optical_depth.append(T)
-
-#Irradiance !!what does it mean "/nm" in file?! need to convert units?!
-def Irradiance(opt_depth):
-    return np.array(I_data["irradiance"]) * np.exp(-np.array(opt_depth))
 
 
-#make plots of optical depth (logarithmic scale for the optical depth?)
-xcoord = I_data["wavelength"]
-ycoord = n_data.iloc[91:,0]
-for key,ele in enumerate(optical_depth):
-    irradiance = Irradiance(ele)
-    fig, axs = plt.subplots(2,1)
-    plt.suptitle(f"solar zenith angle {Xi[key]} degrees")
-    plot1 = axs[0].pcolormesh(xcoord, ycoord, ele, norm=mcolors.LogNorm(vmin = 1e-2, vmax= 1e3), cmap="plasma")
-    plot2 = axs[1].pcolormesh(xcoord, ycoord, irradiance, norm=mcolors.LogNorm(vmin = 1e-7, vmax = 1e-2), cmap="plasma")
-    cbar1 = fig.colorbar(plot1)
-    cbar2 = fig.colorbar(plot2)
-    cbar1.set_label("optical depth [m]")
-    cbar2.set_label("Irradiance")
-    axs[0].set_xlabel("wavelength [nm]")
-    axs[0].set_ylabel("height [km]")
-    axs[1].set_xlabel("wavelength [nm]")
-    axs[1].set_ylabel("height [km]")
-    plt.tight_layout()
-    plt.show()
-\end{python}
+\section{Ionization}
+
+production rate of photo-electrons
+equation for production rate
+\begin{equation}
+dP_e(z, E_e(\lambda, j,l)) = n_j(z)\sigma_j^{i,l}(\lambda)I(z,\lambda)d\lambda
+\end{equation}
+
+equation to calculate excess energy after ionization
+\begin{equation}
+E_e(\lambda, j, l) = E_{ph}(\lambda) - E_{th}^{j,l}=\frac{hc}{|q_e|}\bigl(\frac{1}{\lambda}-\frac{1}{\lambda_{th}(j,l)}\bigr)
+\end{equation}
+
+discuss binning: how do i implement this? the transformation into E is not identical for all species so this is not very accurate?
+
+ Figure 4 shows the results:
+\begin{figure}[H]
+	\centering
+	\caption{Production of photo-electrons for different solar zenith angles.}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{ph_el_production0}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{ph_el_production15}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{ph_el_production30}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{ph_el_production45}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{ph_el_production60}
+	\end{subfigure}
+		\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{ph_el_production75}
+	\end{subfigure}
+\end{figure}
+
+photo ionization profiles as function of altitude
+
+\begin{equation}
+q_j^i(z,l) = n_j(z) \int_{0}^{\lambda_{th}}I(z,\lambda)\sigma_j^{i,j}(\lambda)d\lambda
+\end{equation}
+
+where $\sigma_j^{i,j}$ denotes the ionization cross-sections and I the EUV fluxes as calculated in task 2. 
+
+
+equation for chapman profiles (see Brekke equ. 4.21):
+\begin{equation}
+q = q_{m,0}exp\bigl[1-\frac{z-z_{m,0}}{H}-sec\chi exp\bigl(-\frac{z-z_{m,0}}{H}\bigr)\bigr]
+\end{equation}
+$q_{m,0}$ is the ion production rate at its maximum for an overhead sun (SZA=0) and $z_{m,0}$ is the height of maximum production for SZA=0.
+
+Then use calculated peak ionization in equation to fit chapman profile
+compare chapman and calculated profiles
+\begin{figure}[H]
+	\centering
+	\caption{the calculated profiles on the left, chapman profiles for a constant scaleheight on the right.}
+	\includegraphics[width=0.7\textwidth]{chapman}
+\end{figure}
+
+compare the peak values $q_m$ and peak ionization heights $z_m$ from the calculated profiles with the ones from the chapman profiles as a function of solar zenith angle. The ones from the chapman profiles can be calculated as
+\begin{equation}
+z_m = z_{m,0} + H \cdot ln(sec\chi)
+\end{equation}
+
+and 
+\begin{equation}
+q_m = q_{m,0} cos\chi
+\end{equation}
+(compare Brekke equ. 4.15 and 4.18)
+
+\begin{figure}[H]
+	\centering
+	\caption{Comparison of peak ionization values and heights as a function of solar zenith angle.}
+	\includegraphics[width=0.7\textwidth]{peak_values}
+\end{figure}
+
+
 \end{document}
