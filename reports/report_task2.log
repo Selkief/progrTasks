@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.1.28)  15 MAY 2026 11:54
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.1.28)  18 MAY 2026 11:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -550,7 +550,7 @@ s/optdepth_ionization/figures/crosssec.png>] [3 <C:/Users/skief/Documents/UiT/s
 emester8/space physics/Spacephysics_progrTasks/optdepth_ionization/figures/n.pn
 g>]
 <C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTasks/o
-ptdepth_ionization/figures/optdepth0.png, id=28, 462.528pt x 346.896pt>
+ptdepth_ionization/figures/optdepth0.png, id=28, 925.056pt x 534.798pt>
 File: C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTa
 sks/optdepth_ionization/figures/optdepth0.png Graphic file (type png)
 <use C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTas
@@ -558,9 +558,9 @@ ks/optdepth_ionization/figures/optdepth0.png>
 Package pdftex.def Info: C:/Users/skief/Documents/UiT/semester8/space physics/S
 pacephysics_progrTasks/optdepth_ionization/figures/optdepth0.png  used on input
  line 124.
-(pdftex.def)             Requested size: 204.9466pt x 153.70923pt.
+(pdftex.def)             Requested size: 204.9466pt x 118.48012pt.
 <C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTasks/o
-ptdepth_ionization/figures/optdepth15.png, id=29, 462.528pt x 346.896pt>
+ptdepth_ionization/figures/optdepth15.png, id=29, 925.056pt x 534.798pt>
 File: C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTa
 sks/optdepth_ionization/figures/optdepth15.png Graphic file (type png)
 <use C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTas
@@ -568,9 +568,9 @@ ks/optdepth_ionization/figures/optdepth15.png>
 Package pdftex.def Info: C:/Users/skief/Documents/UiT/semester8/space physics/S
 pacephysics_progrTasks/optdepth_ionization/figures/optdepth15.png  used on inpu
 t line 127.
-(pdftex.def)             Requested size: 204.9466pt x 153.70923pt.
+(pdftex.def)             Requested size: 204.9466pt x 118.48012pt.
 <C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTasks/o
-ptdepth_ionization/figures/optdepth30.png, id=30, 462.528pt x 346.896pt>
+ptdepth_ionization/figures/optdepth30.png, id=30, 925.056pt x 534.798pt>
 File: C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTa
 sks/optdepth_ionization/figures/optdepth30.png Graphic file (type png)
 <use C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTas
@@ -578,9 +578,9 @@ ks/optdepth_ionization/figures/optdepth30.png>
 Package pdftex.def Info: C:/Users/skief/Documents/UiT/semester8/space physics/S
 pacephysics_progrTasks/optdepth_ionization/figures/optdepth30.png  used on inpu
 t line 130.
-(pdftex.def)             Requested size: 204.9466pt x 153.70923pt.
+(pdftex.def)             Requested size: 204.9466pt x 118.48012pt.
 <C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTasks/o
-ptdepth_ionization/figures/optdepth45.png, id=31, 462.528pt x 346.896pt>
+ptdepth_ionization/figures/optdepth45.png, id=31, 925.056pt x 534.798pt>
 File: C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTa
 sks/optdepth_ionization/figures/optdepth45.png Graphic file (type png)
 <use C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTas
@@ -588,9 +588,9 @@ ks/optdepth_ionization/figures/optdepth45.png>
 Package pdftex.def Info: C:/Users/skief/Documents/UiT/semester8/space physics/S
 pacephysics_progrTasks/optdepth_ionization/figures/optdepth45.png  used on inpu
 t line 133.
-(pdftex.def)             Requested size: 204.9466pt x 153.70923pt.
+(pdftex.def)             Requested size: 204.9466pt x 118.48012pt.
 <C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTasks/o
-ptdepth_ionization/figures/optdepth60.png, id=32, 462.528pt x 346.896pt>
+ptdepth_ionization/figures/optdepth60.png, id=32, 925.056pt x 534.798pt>
 File: C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTa
 sks/optdepth_ionization/figures/optdepth60.png Graphic file (type png)
 <use C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTas
@@ -598,9 +598,9 @@ ks/optdepth_ionization/figures/optdepth60.png>
 Package pdftex.def Info: C:/Users/skief/Documents/UiT/semester8/space physics/S
 pacephysics_progrTasks/optdepth_ionization/figures/optdepth60.png  used on inpu
 t line 136.
-(pdftex.def)             Requested size: 204.9466pt x 153.70923pt.
+(pdftex.def)             Requested size: 204.9466pt x 118.48012pt.
 <C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTasks/o
-ptdepth_ionization/figures/optdepth75.png, id=33, 462.528pt x 346.896pt>
+ptdepth_ionization/figures/optdepth75.png, id=33, 925.056pt x 534.798pt>
 File: C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTa
 sks/optdepth_ionization/figures/optdepth75.png Graphic file (type png)
 <use C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTas
@@ -608,7 +608,7 @@ ks/optdepth_ionization/figures/optdepth75.png>
 Package pdftex.def Info: C:/Users/skief/Documents/UiT/semester8/space physics/S
 pacephysics_progrTasks/optdepth_ionization/figures/optdepth75.png  used on inpu
 t line 139.
-(pdftex.def)             Requested size: 204.9466pt x 153.70923pt.
+(pdftex.def)             Requested size: 204.9466pt x 118.48012pt.
  [4]
 <C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTasks/o
 ptdepth_ionization/figures/ph_el_production0.png, id=37, 462.528pt x 346.896pt>
@@ -619,7 +619,7 @@ sks/optdepth_ionization/figures/ph_el_production0.png Graphic file (type png)
 ks/optdepth_ionization/figures/ph_el_production0.png>
 Package pdftex.def Info: C:/Users/skief/Documents/UiT/semester8/space physics/S
 pacephysics_progrTasks/optdepth_ionization/figures/ph_el_production0.png  used 
-on input line 165.
+on input line 164.
 (pdftex.def)             Requested size: 204.9466pt x 153.70923pt.
 <C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTasks/o
 ptdepth_ionization/figures/ph_el_production15.png, id=38, 462.528pt x 346.896pt
@@ -630,7 +630,7 @@ sks/optdepth_ionization/figures/ph_el_production15.png Graphic file (type png)
 ks/optdepth_ionization/figures/ph_el_production15.png>
 Package pdftex.def Info: C:/Users/skief/Documents/UiT/semester8/space physics/S
 pacephysics_progrTasks/optdepth_ionization/figures/ph_el_production15.png  used
- on input line 168.
+ on input line 167.
 (pdftex.def)             Requested size: 204.9466pt x 153.70923pt.
 <C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTasks/o
 ptdepth_ionization/figures/ph_el_production30.png, id=39, 462.528pt x 346.896pt
@@ -641,7 +641,7 @@ sks/optdepth_ionization/figures/ph_el_production30.png Graphic file (type png)
 ks/optdepth_ionization/figures/ph_el_production30.png>
 Package pdftex.def Info: C:/Users/skief/Documents/UiT/semester8/space physics/S
 pacephysics_progrTasks/optdepth_ionization/figures/ph_el_production30.png  used
- on input line 171.
+ on input line 170.
 (pdftex.def)             Requested size: 204.9466pt x 153.70923pt.
 <C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTasks/o
 ptdepth_ionization/figures/ph_el_production45.png, id=40, 462.528pt x 346.896pt
@@ -652,7 +652,7 @@ sks/optdepth_ionization/figures/ph_el_production45.png Graphic file (type png)
 ks/optdepth_ionization/figures/ph_el_production45.png>
 Package pdftex.def Info: C:/Users/skief/Documents/UiT/semester8/space physics/S
 pacephysics_progrTasks/optdepth_ionization/figures/ph_el_production45.png  used
- on input line 174.
+ on input line 173.
 (pdftex.def)             Requested size: 204.9466pt x 153.70923pt.
 <C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTasks/o
 ptdepth_ionization/figures/ph_el_production60.png, id=41, 462.528pt x 346.896pt
@@ -663,7 +663,7 @@ sks/optdepth_ionization/figures/ph_el_production60.png Graphic file (type png)
 ks/optdepth_ionization/figures/ph_el_production60.png>
 Package pdftex.def Info: C:/Users/skief/Documents/UiT/semester8/space physics/S
 pacephysics_progrTasks/optdepth_ionization/figures/ph_el_production60.png  used
- on input line 177.
+ on input line 176.
 (pdftex.def)             Requested size: 204.9466pt x 153.70923pt.
 <C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTasks/o
 ptdepth_ionization/figures/ph_el_production75.png, id=42, 462.528pt x 346.896pt
@@ -674,7 +674,7 @@ sks/optdepth_ionization/figures/ph_el_production75.png Graphic file (type png)
 ks/optdepth_ionization/figures/ph_el_production75.png>
 Package pdftex.def Info: C:/Users/skief/Documents/UiT/semester8/space physics/S
 pacephysics_progrTasks/optdepth_ionization/figures/ph_el_production75.png  used
- on input line 180.
+ on input line 179.
 (pdftex.def)             Requested size: 204.9466pt x 153.70923pt.
  [5 <C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTas
 ks/optdepth_ionization/figures/optdepth0.png> <C:/Users/skief/Documents/UiT/sem
@@ -685,27 +685,27 @@ UiT/semester8/space physics/Spacephysics_progrTasks/optdepth_ionization/figures
 /optdepth45.png> <C:/Users/skief/Documents/UiT/semester8/space physics/Spacephy
 sics_progrTasks/optdepth_ionization/figures/optdepth60.png> <C:/Users/skief/Doc
 uments/UiT/semester8/space physics/Spacephysics_progrTasks/optdepth_ionization/
-figures/optdepth75.png>] [6 <C:/Users/skief/Documents/UiT/semester8/space physi
-cs/Spacephysics_progrTasks/optdepth_ionization/figures/ph_el_production0.png> <
-C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTasks/op
-tdepth_ionization/figures/ph_el_production15.png> <C:/Users/skief/Documents/UiT
-/semester8/space physics/Spacephysics_progrTasks/optdepth_ionization/figures/ph
-_el_production30.png> <C:/Users/skief/Documents/UiT/semester8/space physics/Spa
-cephysics_progrTasks/optdepth_ionization/figures/ph_el_production45.png> <C:/Us
-ers/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTasks/optdept
-h_ionization/figures/ph_el_production60.png> <C:/Users/skief/Documents/UiT/seme
-ster8/space physics/Spacephysics_progrTasks/optdepth_ionization/figures/ph_el_p
-roduction75.png>]
+figures/optdepth75.png>]
 <C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTasks/o
-ptdepth_ionization/figures/chapman.png, id=62, 925.056pt x 534.798pt>
+ptdepth_ionization/figures/chapman.png, id=52, 925.056pt x 534.798pt>
 File: C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTa
 sks/optdepth_ionization/figures/chapman.png Graphic file (type png)
 <use C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTas
 ks/optdepth_ionization/figures/chapman.png>
 Package pdftex.def Info: C:/Users/skief/Documents/UiT/semester8/space physics/S
 pacephysics_progrTasks/optdepth_ionization/figures/chapman.png  used on input l
-ine 204.
+ine 203.
 (pdftex.def)             Requested size: 292.77629pt x 169.26196pt.
+ [6 <C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTas
+ks/optdepth_ionization/figures/ph_el_production0.png> <C:/Users/skief/Documents
+/UiT/semester8/space physics/Spacephysics_progrTasks/optdepth_ionization/figure
+s/ph_el_production15.png> <C:/Users/skief/Documents/UiT/semester8/space physics
+/Spacephysics_progrTasks/optdepth_ionization/figures/ph_el_production30.png> <C
+:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTasks/opt
+depth_ionization/figures/ph_el_production45.png> <C:/Users/skief/Documents/UiT/
+semester8/space physics/Spacephysics_progrTasks/optdepth_ionization/figures/ph_
+el_production60.png> <C:/Users/skief/Documents/UiT/semester8/space physics/Spac
+ephysics_progrTasks/optdepth_ionization/figures/ph_el_production75.png>]
 <C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTasks/o
 ptdepth_ionization/figures/peak_values.png, id=63, 925.056pt x 534.798pt>
 File: C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTa
@@ -714,7 +714,7 @@ sks/optdepth_ionization/figures/peak_values.png Graphic file (type png)
 ks/optdepth_ionization/figures/peak_values.png>
 Package pdftex.def Info: C:/Users/skief/Documents/UiT/semester8/space physics/S
 pacephysics_progrTasks/optdepth_ionization/figures/peak_values.png  used on inp
-ut line 221.
+ut line 220.
 (pdftex.def)             Requested size: 292.77629pt x 169.26196pt.
  [7 <C:/Users/skief/Documents/UiT/semester8/space physics/Spacephysics_progrTas
 ks/optdepth_ionization/figures/chapman.png> <C:/Users/skief/Documents/UiT/semes
@@ -748,7 +748,7 @@ Users/skief/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsltt
 s/cm/cmsy10.pfb><C:/Users/skief/AppData/Local/Programs/MiKTeX/fonts/type1/publi
 c/amsfonts/cm/cmsy8.pfb><C:/Users/skief/AppData/Local/Programs/MiKTeX/fonts/typ
 e1/public/amsfonts/cm/cmtt10.pfb>
-Output written on report_task2.pdf (7 pages, 1425562 bytes).
+Output written on report_task2.pdf (7 pages, 1747450 bytes).
 PDF statistics:
  124 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

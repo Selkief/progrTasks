@@ -21,7 +21,7 @@ height = n_data.iloc[:,0].to_numpy()
 I_data = pd.read_csv("optdepth_ionization/fism_daily_hr19990216.dat")
 wl = I_data["wavelength (nm)"].to_numpy()*1e-9 #wavelength in data in meters
 wl = wl[:1000]
-I_inf = I_data["irradiance (W/m^2/nm)"].to_numpy()[:1000]*1e9 #irradiance on top of atmopshere for different wavelengths
+I_inf = I_data["irradiance (W/m^2/nm)"].to_numpy()[:1000]*1e9 #irradiance on top of atmopshere for different wavelengths [m]
 
 #crosssections [m^2] for different species for different wavelengths [m]
 cs_data = pd.read_csv("optdepth_ionization/phot_abs.dat",sep=r"\s+", skiprows=8)
@@ -88,18 +88,20 @@ for X in Xi:
 
 #make plots
 if __name__ == "__main__":
-    #mpl.rcParams['font.size'] = 14
+    mpl.rcParams['font.size'] = 14
     xcoord = wl*1e9
     ycoord = n_data.iloc[100:,0]
     for key,ele in enumerate(optical_depth):
         fig, axs = plt.subplots(2,1)
         plt.suptitle(f"solar zenith angle {Xi[key]} degrees")
         plot1 = axs[0].pcolormesh(xcoord, ycoord, ele, norm=mcolors.LogNorm(vmin = 1e-2, vmax= 1e3), cmap="plasma")
-        plot2 = axs[1].pcolormesh(xcoord, ycoord, irradiance[key], norm=mcolors.LogNorm(vmin = 1e4, vmax = 1e10), cmap="plasma")
+        #plot2 = axs[1].pcolormesh(xcoord, ycoord, irradiance[key], norm=mcolors.LogNorm(vmin = 1e0, vmax = 1e8), cmap="plasma")
+        plot2 = axs[1].pcolormesh(xcoord, ycoord, irradiance_ph[key]*1e-9, norm=mcolors.LogNorm(vmin = 1e6, vmax = 1e14), cmap="plasma")
         cbar1 = fig.colorbar(plot1)
         cbar2 = fig.colorbar(plot2)
         cbar1.set_label("optical depth")
-        cbar2.set_label("Irradiance [W $m^{-2} s^{-1}$]")
+        cbar2.set_label("Irradiance [photons $m^{-2} s^{-1} nm^{-1}$]")
+        axs[0].contour(xcoord, ycoord, ele, levels=[1], linewidths=0.5)
         axs[0].set_xlabel("wavelength [nm]")
         axs[0].set_ylabel("height [km]")
         axs[1].set_xlabel("wavelength [nm]")

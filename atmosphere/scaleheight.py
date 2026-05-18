@@ -56,7 +56,7 @@ def exp_H(data_file, species):
         column = 3
     H = []
     for i in range(1,600):
-        Hz = (-data_file.iloc[i,column])/((data_file.iloc[i, column]-data_file.iloc[i-1, column])/10e2)
+        Hz = (-data_file.iloc[i,column])/((data_file.iloc[i, column]-data_file.iloc[i-1, column]+1e-8)/10e2)
         if Hz>=0:
             H.append(float(Hz))
     return H

@@ -71,6 +71,7 @@ def photo_ion_rate_matrix(densities, ion_cs, EUVflux):
     q_total = np.zeros(EUVflux.shape[0])
     #total photo electrons 
     P_total = np.zeros_like(EUVflux)
+    dlambda = 1e-9
 
     for idx, cs_j in enumerate(ion_cs):
         n_z = densities[100:, idx][:,None]
@@ -85,7 +86,7 @@ def photo_ion_rate_matrix(densities, ion_cs, EUVflux):
         #reorder from low energies to high energies as new xcoord, use next lower integer as value
         idx_sorted = np.argsort(E_eV)
         E_eV = np.floor(E_eV[idx_sorted])
-        dq_sorted = dq_j[:, idx_sorted]
+        dq_sorted = dq_j[:, idx_sorted]*dlambda
 
         P_total += dq_sorted
         
@@ -122,7 +123,7 @@ for idx, X in enumerate(Xi):
     zm.append( np.array(max_ionisation)[0,1] + np.log(1/np.cos(np.deg2rad(X)))*H )
     qm.append( np.array(max_ionisation)[0,0] * np.cos(np.deg2rad(X)))
 
-
+print(np.array(total_photoion))
 #make plots
 if __name__ == "__main__":
     mpl.rcParams['font.size'] = 14
@@ -174,14 +175,14 @@ if __name__ == "__main__":
     for key,ele in enumerate(photo_electrons):
         fig, axs = plt.subplots(1,1)
         plt.suptitle(f"solar zenith angle {Xi[key]} degrees")
-        plot1 = axs.pcolormesh(new_x, ycoord, ele, norm=mcolors.LogNorm(vmin = 1e12, vmax = 1e18), cmap="jet")
+        plot1 = axs.pcolormesh(new_x, ycoord, ele, norm=mcolors.LogNorm(vmin = 1e3, vmax = 1e9), cmap="jet")
         cbar1 = fig.colorbar(plot1)
         cbar1.set_label("photo electrons [$m^{-2}s^{-1}$]")
         axs.set_xlabel("Energy [eV]")
         axs.set_ylabel("height [km]")
         axs.set_xlim(0, 150)
         plt.tight_layout()
-        #plt.show()
+        plt.show()
 
     #ionization cross sections
     plt.plot(wl*1e9, ion_cs_N2, label = "N2")
