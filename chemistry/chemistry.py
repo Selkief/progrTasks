@@ -231,9 +231,6 @@ def plot_odes(time1, solution1, time2=None, solution2=None, height=None, temp_va
         if temp_var == "yes":
             ax.plot(time2, solution2[idx][:], ls = "--", color = colours[idx])
             ax.set_xlim(3500,3600+760)
-    #ax.axvline(3600, ls="dotted", color="black")
-    #ax.axvline(3680, ls="dotted", color="black")
-    #ax.axvline(3760, ls="dotted", color="black")
     ax.set_xlabel("t")
     ax.set_ylabel("density [$m^{-3}$]")
     ax.legend()
