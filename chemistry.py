@@ -67,7 +67,7 @@ def initial_cond(ht):
     return n_e, n_Oplus, n_O2plus, n_N2plus, n_NOplus, n_NO
 
 
-def reactions(t, z, q_tot, height, temp_change):
+def reactions(t, z, q_func, height, temp_change):
     #ODEs for coupled cont equations 
     # calculate production and loss of major species in atmosphere
     #q is an array of all ionizatio rates, in same order as z
@@ -83,9 +83,11 @@ def reactions(t, z, q_tot, height, temp_change):
     n_O2 = n_O2_data[ idx ]
     n_N2 = n_N2_data[ idx]
 
-    #could be outside function as this is cst !!!
+    if callable(q_func):
+        q_e = q_func(t)
+    else:
+        q_e = q_func
     denom = (0.92 * n_N2 + n_O2 + 0.56 * n_O)
-    q_e = q_tot
     q_N2plus = q_e * 0.92 * n_N2 / denom
     q_Oplus = q_e * 0.56 * n_O / denom
     q_O2plus = q_e *  n_O2 / denom
@@ -113,23 +115,24 @@ def ODE_solver(altitude, method, dT0, dT1, rtol):
     #returns the solution for the 5 coupled equations and the time array
     q0 = 1e9
     IC = initial_cond(altitude)
-    sol0 = solve_ivp(reactions, [0,3600], IC, method = method, args=(q0, altitude, dT0), rtol=rtol)
+    sol0 = solve_ivp(reactions, [0,3600], IC, method = method, args=(q0, altitude, dT0), rtol=rtol, t_eval=np.arange(0,3600,1))
 
     #use previous solution as new initial conditions
     #integrate with q_e=2*1e10 for 160s, then no ionisation at all
     q1 = 2e10
-    sol1 = solve_ivp(reactions, [3601, 3600+80], sol0.y[:,-1], method=method, args=(q1, altitude, dT0), rtol=rtol )
+    sol1 = solve_ivp(reactions, [3601, 3600+80], sol0.y[:,-1], method=method, args=(q1, altitude, dT0), rtol=rtol, t_eval=np.arange(3601,3680,1))
 
     #different ion and electron temperatures after 80s
     q2 = 2e10
-    sol2 = solve_ivp(reactions, [3601+80, 3600+160], sol1.y[:,-1], method=method, args=(q2, altitude, dT1), rtol=rtol)
+    sol2 = solve_ivp(reactions, [3601+80, 3600+160], sol1.y[:,-1], method=method, args=(q2, altitude, dT1), rtol=rtol, t_eval=np.arange(3681,3760,1))
     
     q3 = 0
-    sol3 = solve_ivp(reactions, [3601+160, 3600+400], sol2.y[:,-1], method=method, args=(q3, altitude, dT1), rtol=rtol)
+    sol3 = solve_ivp(reactions, [3601+160, 3600+760], sol2.y[:,-1], method=method, args=(q3, altitude, dT1), rtol=rtol, t_eval=np.arange(3761, 3600+760,1))
 
     sols = np.hstack((sol0.y, sol1.y, sol2.y, sol3.y))  # Combine solutions along the state variable axis
     times = np.hstack((sol0.t, sol1.t, sol2.t, sol3.t))      #combine time arrays
     return sols, times
+
 
 solutions_110, time_110 = ODE_solver(110, "Radau", 0, 0, 1e-8)
 solutions_110dT, time_110dT = ODE_solver(110, "Radau", 0, 1000, 1e-8)
@@ -143,39 +146,136 @@ solutions_180dT, time_180dT = ODE_solver(180, "Radau", 0, 2000, 1e-8)
 solutions_250, time_250 = ODE_solver(250, "Radau", 0, 0, 1e-8)
 solutions_250dT, time_250dT = ODE_solver(250, "Radau", 0, 2000, 1e-8)
 
+def varying_q(t):
+    q_hat = 2e10 #[m^-3s^-1]
+    return q_hat * np.sin(2*np.pi*t/20)**2
+
+t_test = np.arange(0,600,1)
+q_t = varying_q(t_test)
+plt.plot(t_test, q_t)
+plt.title("$q_e(t)=\\hat q_e sin^2(2 \\pi t/20)$")
+plt.show()
+
+def ODE_solver2(altitude, method, rtol):
+    
+    q0 = varying_q
+    IC = initial_cond(altitude)
+    sol0 = solve_ivp(reactions, [0,100], IC, method = method, args=(q0, altitude, 0), rtol=rtol, t_eval=np.arange(0,100,1))
+
+    q1 = 0.0
+    sol1 = solve_ivp(reactions, [101, 600], sol0.y[:,-1], method=method, args=(q1, altitude, 0), rtol=rtol, t_eval=np.arange(101,600,1))
+
+    sols = np.hstack((sol0.y, sol1.y))  # Combine solutions along the state variable axis
+    times = np.hstack((sol0.t, sol1.t))      #combine time arrays
+    return sols, times
+
+varyingq_110, vartimes_110 = ODE_solver2(110, "Radau", 1e-8)
+varyingq_150, vartimes_150 = ODE_solver2(150, "Radau", 1e-8)
+varyingq_180, vartimes_180 = ODE_solver2(180, "Radau", 1e-8)
+varyingq_250, vartimes_250 = ODE_solver2(250, "Radau", 1e-8)
+
+def decay(region, t):
+    #calculates expected decay after ionization is "turned off" at t=3760
+    #input: reaction rates of the corresponding height/temperature
+    #densities before the ionization stops as 
+    global Te, Ti, Tn, solutions_110, time_110, solutions_250, time_250
+    if region == "E":
+        idx = 110 - 100
+        n = solutions_110
+        t0 = np.argmax(n[0])
+        print(n.shape)
+        n_e0 = n[0][t0]
+        n_NOplus = n[4][t0]
+        n_O2plus = n[2][t0]
+        n_N2plus = n[3][t0]
+        coeffs = reaction_coeffs(T_e[idx], T_i[idx], T_n[idx])
+        alpha_1, alpha_2, alpha_3 = coeffs[0], coeffs[1], coeffs[2]
+        alpha_e = alpha_1 * n_NOplus/n_e0 + alpha_2 * n_O2plus/n_e0 + alpha_3 * n_N2plus/n_e0
+        n_e = n_e0 / (1 + alpha_e * n_e0 * t)
+    elif region == "F":
+        idx = 250 - 100
+        n = solutions_250
+        t0 = np.argmax(n[0])
+        n_e0 = n[0][t0]
+        n_NOplus = n[4][t0]
+        n_O2plus = n[2][t0]
+        n_O2 = n_O2_data[idx]
+        n_N2 = n_N2_data[idx]
+        coeffs = reaction_coeffs(T_e[idx], T_i[idx], T_n[idx])
+        alpha_1, alpha_2, k_1, k_2 = coeffs[0], coeffs[1], coeffs[4], coeffs[5]
+        #include O2plus NOplus diss recomb?
+        beta = k_2 * n_O2 + k_1 * n_N2 + alpha_1 * n_NOplus/n_e0 + alpha_2 * n_O2plus/n_e0
+        n_e = n_e0 * np.exp(-beta*t)  
+    return n_e  
+
+t = np.arange(0, 600,1)
+decay_E = decay("E", t)
+decay_F = decay("F", t)
+
 #charge conservation -->show in percent or in abs values?
 def calc_charge(solution):
     electrons = solution[0,:]
     ions = np.sum(solution[1:5,:], axis=0)
     return ions - electrons
 
-labels = ["e", "O+", "O2+", "N2+", "NO+", "NO"]
-colours = ["blue", "red", "purple", "green", "pink", "orange" ]
 
-def plot_odes(time1, solution1, time2, solution2, height):
+def plot_odes(time1, solution1, time2=None, solution2=None, height=None, temp_var=None):
+    labels = ["e", "O+", "O2+", "N2+", "NO+", "NO"]
+    colours = ["blue", "red", "purple", "green", "pink", "orange" ]
     #plot the solutions for cst and for varying temperature in one plot
     fig = plt.figure()
     ax = fig.add_subplot(111)
 
     for idx in range(len(solution1)):
         ax.plot(time1, solution1[idx][:], label = labels[idx], color = colours[idx])
-        ax.plot(time2, solution2[idx][:], label = labels[idx], ls = "--", color = colours[idx])
+        if temp_var == "yes":
+            ax.plot(time2, solution2[idx][:], ls = "--", color = colours[idx])
+            ax.set_xlim(3500,3600+760)
     #ax.axvline(3600, ls="dotted", color="black")
     #ax.axvline(3680, ls="dotted", color="black")
     #ax.axvline(3760, ls="dotted", color="black")
     ax.set_xlabel("t")
+    ax.set_ylabel("density [$m^{-3}$]")
     ax.legend()
     fig.suptitle(f"densities at height {height}km")
 
-plot_odes(time_110, solutions_110, time_110dT, solutions_110dT, 110)
-plot_odes(time_150, solutions_150, time_150dT, solutions_150dT, 150)
-plot_odes(time_180, solutions_180, time_180dT, solutions_180dT, 180)
-plot_odes(time_250, solutions_250, time_250dT, solutions_250dT, 250)
+plot_odes(time_110, solutions_110, time_110dT, solutions_110dT, 110, "yes")
+plot_odes(time_150, solutions_150, time_150dT, solutions_150dT, 150, "yes")
+plot_odes(time_180, solutions_180, time_180dT, solutions_180dT, 180, "yes")
+plot_odes(time_250, solutions_250, time_250dT, solutions_250dT, 250, "yes")
 plt.show()
+
+plot_odes(vartimes_110, varyingq_110, height=110)
+plot_odes(vartimes_150, varyingq_150, height=150)
+plot_odes(vartimes_180, varyingq_180, height=180)
+plot_odes(vartimes_250, varyingq_250, height=250)
+plt.show()
+
+
+plt.plot(time_110[3700:], solutions_110[0][3700:], label="modelled electrons")
+plt.plot(3760 + t, decay_E, label="$n_e(0) /(1+\\alpha_e n_e(0) t)  $")
+plt.xlabel("t")
+#plt.yticks(np.arange(0, 5, 1)*1e11)
+plt.ylabel("densities")
+plt.legend()
+plt.grid()
+plt.title("electron densities without ionization at 110km")
+plt.show()
+
+plt.plot(time_250[3700:], solutions_250[0][3700:], label="modelled electrons")
+plt.plot(3760 + t, decay_F, label="$n_e(0) e^{-\\beta t}$")
+plt.xlabel("t")
+#plt.yticks(np.arange(0,3.0, 0.5)*1e12)
+plt.ylabel("densities")
+plt.legend()
+plt.grid()
+plt.title("electron densities without ionization at 250km")
+plt.show()
+
 
 plt.plot(time_110, calc_charge(solutions_110))
 plt.plot(time_180dT, calc_charge(solutions_180dT))
 plt.title("charge conservation")
-plt.show()
+#plt.show()
 
 
